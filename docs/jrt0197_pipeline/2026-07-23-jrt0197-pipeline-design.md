@@ -21,44 +21,55 @@ extract → validate → build-review → awaiting_review
 
 This run produces candidate rules, validation and difference reports, page evidence, and a review workbook, then stops for independent human review. `freeze`, rule/field SFT generation, field mapping, splitting, and final audit are tested only with synthetic fixtures.
 
-Acceptance explicitly proves that no `outputs/frozen/**`, `outputs/datasets/**`, `jrt0197_rule_master.jsonl`, `jrt0197_rule_sft_*.jsonl`, or `finance_field_verified_*.jsonl` real-data artifact exists.
+Acceptance explicitly proves that no `<runtime_root>/frozen/**`, `<runtime_root>/datasets/**`, `jrt0197_rule_master.jsonl`, `jrt0197_rule_sft_*.jsonl`, or `finance_field_verified_*.jsonl` real-data artifact exists.
 
 ## 3. Repository and data isolation
 
-The independent repository is `D:\work\2026.7.13_微调\jrt0197_pipeline`. It contains source, versioned configuration, schemas, documentation, dependency locks, tests, and synthetic/minimized fixtures only.
+The pipeline is developed inside the existing `laiwanzhou/LlamaFactory` repository on the `dev` branch. Its implementation root is `tools/jrt0197_pipeline/`, and its design and project documentation root is `docs/jrt0197_pipeline/`.
 
-The existing `data` directory, `tmp/audit`, and historical result workbooks remain read-only outside the repository. Real PDF, XLSX, CSV, JSONL, logs, workbooks, previews, and outputs are excluded from Git. `.gitattributes` fixes LF for text and marks binary artifacts explicitly.
+Real financial PDF, CSV, XLSX, review workbooks, previews, logs, candidate snapshots, frozen masters, and generated datasets remain outside the Git repository under a configured `<runtime_root>`. A local ignored runtime directory may be used only when explicitly configured. The repository's existing LLaMA Factory `data/` directory is not used for real financial source files, avoiding confusion with LLaMA Factory training dataset configuration.
+
+The external source directory, historical `tmp/audit` scripts, and historical result workbooks remain read-only. Git contains only source, versioned configuration, schemas, documentation, dependency locks, tests, and synthetic/minimized fixtures. The repository's existing Git attributes normalize text content to LF; runtime serializers also write deterministic LF explicitly.
 
 ## 4. Architecture and responsibilities
 
 Python owns CLI orchestration, semantics, extraction, normalization, validation, hashing, approval enforcement, permanent IDs, field mapping, quality tiers, SFT generation, splitting, and audit decisions. JavaScript only reads Python-produced contracts to generate and render the review workbook.
 
 ```text
-pipeline.py
-src/jrt_pipeline/
-  cli.py
-  contracts.py
-  hashing.py
-  normalization.py
-  extraction/table_a1.py
-  validation/rules.py
-  review/contract.py
-  freeze/service.py
-  fields/parsers.py
-  fields/mapping.py
-  fields/quality_tiers.py
-  sft/rules.py
-  sft/fields.py
-  splitting/constrained.py
-  audit/report.py
-tools/build_review.mjs
-schemas/
-tests/fixtures/
-tests/unit/
-tests/integration/
-docs/superpowers/specs/
-outputs/
+docs/
+  jrt0197_pipeline/
+    2026-07-23-jrt0197-pipeline-design.md
+
+tools/
+  jrt0197_pipeline/
+    pipeline.py
+    src/
+      jrt_pipeline/
+        cli.py
+        contracts.py
+        hashing.py
+        normalization.py
+        extraction/table_a1.py
+        validation/rules.py
+        review/contract.py
+        freeze/service.py
+        fields/parsers.py
+        fields/mapping.py
+        fields/quality_tiers.py
+        sft/rules.py
+        sft/fields.py
+        splitting/constrained.py
+        audit/report.py
+    tools/
+      build_review.mjs
+    schemas/
+    tests/
+      fixtures/
+      unit/
+      integration/
 ```
+
+Real runs write to the configured external `<runtime_root>`, for example `D:\work\2026.7.13_微调\jrt0197_pipeline_outputs\`, rather than a fixed repository-relative `outputs/` directory.
 
 JavaScript may create tables/styles, add review columns, apply conditional formatting, and render previews. It may not rewrite a path or rule, decide a level, calculate semantic fingerprints, approve records, or allocate permanent IDs.
 
@@ -78,17 +89,17 @@ audit
 candidate
 ```
 
-`candidate` runs `extract → validate → build-review` and stops. State is attached to immutable artifacts:
+`candidate` runs `extract → validate → build-review` and stops. State is read from the versioned manifest specific to each artifact family; no separate mutable global `manifest.json` is maintained:
 
 ```text
-outputs/candidate/<run_id>/manifest.json
-outputs/frozen/<version>/manifest.json
-outputs/datasets/<version>/manifest.json
+<runtime_root>/candidate/<run_id>/jrt0197_rule_candidate_manifest.json
+<runtime_root>/frozen/<version>/jrt0197_rule_manifest.json
+<runtime_root>/datasets/<version>/<dataset_family>_manifest.json
 ```
 
 Candidate state ends at `awaiting_review`. Freeze creates a new version; it never edits a candidate snapshot.
 
-Outputs are written under a same-volume sibling such as `outputs/candidate/.tmp-<run_id>/`, verified, then renamed into place. Existing targets fail, no overwrite option exists, and every run uses a new ID. Read-only file attributes are only supplemental protection.
+Outputs are written under a same-volume sibling such as `<runtime_root>/candidate/.tmp-<run_id>/`, verified, then renamed into place. Existing targets fail, no overwrite option exists, and every run uses a new ID. Read-only file attributes are only supplemental protection.
 
 ## 6. Table A.1 extraction
 
@@ -117,7 +128,7 @@ The semantic fingerprint is SHA-256 over canonical fixed-order JSON containing o
 Each immutable snapshot contains:
 
 ```text
-outputs/candidate/<run_id>/
+<runtime_root>/candidate/<run_id>/
   jrt0197_rule_master_candidate.jsonl
   jrt0197_rule_candidate_manifest.json
   jrt0197_rule_validation_report.json
@@ -207,6 +218,13 @@ finance_field_english_supplemental.jsonl
 ```
 
 Verified but non-splittable A/B fields go only to disabled-by-default `finance_field_train_supplemental.jsonl`. English train/validation/test files are created only when the independent-coverage threshold in Section 15 is met; otherwise only the English supplemental file is produced.
+
+Non-training auditable field artifacts use their full structured contracts rather than Alpaca's three-field schema:
+
+```text
+finance_field_master.jsonl
+finance_field_review_queue.jsonl
+```
 
 Every Alpaca file has a same-order `<dataset>.index.jsonl` with line number, sample/source/rule IDs, task type, quality tier where applicable, split group, and sample hash.
 
