@@ -1,0 +1,10 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "x-key-order": ["physical_page", "width", "height", "page_png_sha256", "table_bounds", "raw_cells", "raw_cells_sha256", "cell_bounding_boxes", "blocks", "unassigned_count", "page_png_source"],
+  "properties": {
+    "physical_page": {"type": "integer"}, "width": {"type": "number"}, "height": {"type": "number"}, "page_png_sha256": {"type": "string"}, "table_bounds": {"type": ["array", "null"]}, "raw_cells": {"type": "array"}, "raw_cells_sha256": {"type": "string"}, "cell_bounding_boxes": {"type": "array"}, "blocks": {"type": "array", "items": {"type": "object", "x-key-order": ["block_id", "text", "bounding_box", "ownership", "in_table_body", "row_locator"], "properties": {"block_id": {"type": "string"}, "text": {"type": "string"}, "bounding_box": {"type": "array"}, "ownership": {"type": "string"}, "in_table_body": {"type": "boolean"}, "row_locator": {"type": ["string", "null"]}}, "additionalProperties": false}}, "unassigned_count": {"type": "integer"}, "page_png_source": {"type": ["string", "null"]}
+  },
+  "required": ["physical_page", "width", "height", "page_png_sha256", "table_bounds", "raw_cells", "raw_cells_sha256", "cell_bounding_boxes", "blocks", "unassigned_count", "page_png_source"],
+  "additionalProperties": false
+}

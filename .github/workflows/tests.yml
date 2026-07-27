@@ -91,6 +91,11 @@ jobs:
         run: |
           make license
 
+      - name: Check JR/T 0197 pipeline
+        run: |
+          uv sync --project tools/jrt0197_pipeline --group dev
+          make jrt-quality jrt-license jrt-test-python
+
       - name: Check build
         run: |
           make build

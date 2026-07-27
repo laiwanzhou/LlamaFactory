@@ -164,6 +164,7 @@ cython_debug/
 
 # uv
 uv.lock
+!tools/jrt0197_pipeline/uv.lock
 
 # macOS
 .DS_Store
@@ -177,6 +178,7 @@ llamaboard_config/
 saves/
 output/
 outputs/
+tools/jrt0197_pipeline/outputs/
 wandb/
 swanlog/
 generated_predictions.jsonl

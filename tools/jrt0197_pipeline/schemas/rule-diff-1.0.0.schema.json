@@ -1,0 +1,10 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "x-key-order": ["schema_name", "schema_version", "baseline_type", "baseline_status", "baseline_id", "baseline_hash", "manifest_hash", "added_count", "removed_count", "changed_count", "added", "removed", "changes", "record_count_change", "level_distribution_change"],
+  "required": ["schema_name", "schema_version", "baseline_type", "baseline_status", "baseline_id", "baseline_hash", "added_count", "removed_count", "changed_count", "added", "removed", "changes", "record_count_change", "level_distribution_change"],
+  "properties": {
+    "schema_name": {"const": "jrt0197_rule_diff"}, "schema_version": {"const": "1.0.0"}, "baseline_type": {"type": ["string", "null"]}, "baseline_status": {"type": "string"}, "baseline_id": {"type": ["string", "null"]}, "baseline_hash": {"type": ["string", "null"]}, "manifest_hash": {"type": ["string", "null"]}, "added_count": {"type": "integer"}, "removed_count": {"type": "integer"}, "changed_count": {"type": "integer"}, "added": {"type": "array"}, "removed": {"type": "array"}, "changes": {"type": "array"}, "record_count_change": {"type": "integer"}, "level_distribution_change": {"type": "object"}
+  },
+  "additionalProperties": false
+}

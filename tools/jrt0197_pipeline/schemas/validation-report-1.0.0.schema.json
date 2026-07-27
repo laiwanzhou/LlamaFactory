@@ -1,0 +1,10 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "x-key-order": ["schema_name", "schema_version", "validation_status", "error_count", "warning_count", "info_count", "findings", "page_coverage", "record_count", "level_distribution", "source_order_contiguous", "source_locator_unique", "duplicate_fingerprint_count", "path_level_conflict_count", "missing_class4_count", "unassigned_table_body_count", "comparison"],
+  "required": ["schema_name", "schema_version", "validation_status", "error_count", "warning_count", "info_count", "findings", "page_coverage", "record_count", "level_distribution"],
+  "properties": {
+    "schema_name": {"const": "jrt0197_rule_validation_report"}, "schema_version": {"const": "1.0.0"}, "validation_status": {"enum": ["passed", "failed"]}, "error_count": {"type": "integer"}, "warning_count": {"type": "integer"}, "info_count": {"type": "integer"}, "findings": {"type": "array"}, "page_coverage": {"type": "object"}, "record_count": {"type": "integer"}, "level_distribution": {"type": "object"}, "source_order_contiguous": {"type": "boolean"}, "source_locator_unique": {"type": "boolean"}, "duplicate_fingerprint_count": {"type": "integer"}, "path_level_conflict_count": {"type": "integer"}, "missing_class4_count": {"type": "integer"}, "unassigned_table_body_count": {"type": "integer"}, "comparison": {"type": "object"}
+  },
+  "additionalProperties": false
+}

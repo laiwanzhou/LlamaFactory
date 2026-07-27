@@ -1,4 +1,4 @@
-.PHONY: build commit license quality style test
+.PHONY: build commit license quality style test jrt-quality jrt-license jrt-test-python
 
 check_dirs := scripts src tests tests_v1
 
@@ -26,3 +26,13 @@ style:
 
 test:
 	WANDB_DISABLED=true $(RUN) pytest -vv --import-mode=importlib tests/ tests_v1/
+
+jrt-quality:
+	uv run --project tools/jrt0197_pipeline ruff check tools/jrt0197_pipeline
+	uv run --project tools/jrt0197_pipeline ruff format --check tools/jrt0197_pipeline
+
+jrt-license:
+	$(RUN) python3 tests/check_license.py tools/jrt0197_pipeline/src tools/jrt0197_pipeline/tests tools/jrt0197_pipeline/pipeline.py
+
+jrt-test-python:
+	uv run --project tools/jrt0197_pipeline pytest -q tools/jrt0197_pipeline/tests
